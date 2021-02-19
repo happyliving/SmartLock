@@ -6,7 +6,7 @@ Slide:
 
 Website:  
 >with Webduino:  
->https://happyliving.github.io/Porject/index.html
+>https://happyliving.github.io/SmartLock/index.html
 >
 >without Webduino(demo only):  
->https://happyliving.github.io/Project/ui_demo.html
+>https://happyliving.github.io/SmartLock/ui_demo.html
