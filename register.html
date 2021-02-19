@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>History Infomation</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+    body {
+        padding-top: 70px;
+        /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+    }
+    </style>
+	
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link  href="https://fonts.googleapis.com/css?family=Allan:bold" rel="stylesheet" type="text/css" >
+	<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+	<script type="text/javascript" src="http://d3js.org/topojson.v1.min.js"></script>
+	<script src="https://webduino.io/components/webduino-js/dist/webduino-all.min.js"></script>
+	<script src="https://blockly.webduino.io/webduino-blockly.js"></script>
+	<script src="https://blockly.webduino.io/lib/runtime.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<style>
+    .error {
+        color: red;
+    }
+    </style>
+    </style>
+	<script>
+    var userAccount;
+	$(document).ready( function () {
+		
+	    var config = {
+            apiKey: "AIzaSyCyAM9AtsheRumbUzYQDpPhGUbRrhBywQk",
+            authDomain: "smartlock-9c4c4.firebaseapp.com",
+            databaseURL: "https://smartlock-9c4c4.firebaseio.com",
+            projectId: "smartlock-9c4c4",
+            storageBucket: "smartlock-9c4c4.appspot.com",
+            messagingSenderId: "388128189298"
+        };
+		firebase.initializeApp(config);
+            $("#register").on('submit',function(){
+            register();
+            return false;
+        }); 
+
+        $("#password").on('focusout',function(){
+            checkPassword();
+        });
+
+        $("#confirmPassword").on('focusout',function(){
+            checkConfirmPassword();
+        }); 
+
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                
+                userAccount = user.email;
+                window.location = "index.html";
+            } else {
+                userAccount = "Not logged in";
+                //console.log("Sign Out");
+            }
+            $("#mail").html(userAccount);
+        });
+    });
+    
+    function checkPassword(){
+        if($("#password").val().length >= 6){
+            document.getElementById("password").style.border = "";
+            document.getElementById("passError").innerHTML = "";
+            return true;
+        }else{
+            document.getElementById("password").style.border = "solid 1px red";
+            document.getElementById("passError").innerHTML = "密碼至少必須包含 6 個字元";
+            return false;
+        }
+    }
+
+    function checkConfirmPassword(){
+        if($("#confirmPassword").val() == $("#password").val()){
+            document.getElementById("confirmPassword").style.border = "";
+            document.getElementById("confirmpassError").innerHTML = "";
+            return true;
+        }else{
+            document.getElementById("confirmPassword").style.border = "solid 1px red";
+            document.getElementById("confirmpassError").innerHTML = "密碼不同";
+            return false;
+        }
+    }
+
+
+    function register(){
+        if(checkPassword() && checkConfirmPassword() ){
+            email = $("#account").val();
+            password = $("#password").val();
+            $("input[type='password']").val('');
+            console.log(email + "\n" + password);
+            firebase.auth().createUserWithEmailAndPassword(email, password).then(function(user){
+                //console.log(user);
+                //console.log("success");
+                alert("註冊成功");
+            },function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                console.log(errorCode + "\n" + errorMessage);
+                if(errorCode == "auth/email-already-in-use"){
+                    alert("email 已經被註冊過");
+                }else if(errorCode == "auth/invalid-email"){
+                    alert("無效的 email");
+                }
+                // ...
+            });
+        }
+    }
+    </script>
+	
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">smartLock</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+					<li>
+                        <a href="login.html">Login</a>
+                    </li>
+                    <li>
+                        <a href="history.html">History</a>
+                    </li>
+                    <li>
+                        <a style = "color:white">Account: <span id = "mail"></span></a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+		<p style='font-size:60px;text-align:center;font-weight:bold;text-family:"Allan";position:relative;top:15%;text-shadow: -5px 5px 5px rgba(0,0,0, 0.3);'>Welcome</p>
+
+		<div style="position:relative;top:20%;" id = "loginArea">
+			<form id="register" style="text-align:center;font-size:20px;text-align:left;">
+				Account : <br><input id="account" type="email" required style="border-radius:20px; font-size:27px;"></input>
+                <span id = "accountError" class = "error"></span><br><br>
+				Password : <br><input id="password" type="password" required style="border-radius:20px; font-size:27px;"></input>
+                <span id = "passError" class = "error"></span><br><br>
+				Please enter your password again : <br><input id="confirmPassword" type="password" required style="border-radius:20px; font-size:27px;"></input>
+                <span id = "confirmpassError" class = "error"></span><br><br>
+				<span style="position:absolute;right:10px;">
+				<button type="submit" style="border-radius:20px;background-color:#000000;font-size:30px;color:#FFFFFF;">Submit</button>
+				</span>
+			</form>
+		</div>
+
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery Version 1.11.1 -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,101 @@
+.onoffswitch {
+    position: relative;
+	left:35%;
+	width: 98px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 20px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    content: "LOCK";
+    padding-left: 7px;
+    background-color: #F51F1B; color: #FFFFFF;
+}
+.onoffswitch-inner:after {
+    content: "UNLOCK";
+    padding-right: 7px;
+    background-color: #22F71B; color: #FFFFFF;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; width: 18px; margin: 6px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 64px;
+    border: 2px solid #999999; border-radius: 20px;
+    transition: all 0.3s ease-in 0s; 
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px; 
+}
+.nowStatus{
+	font-family: 'Allan', serif;
+	font-size:100px;
+	fill: white;
+}
+html{
+	height:100%;
+	width:100%;
+}
+body{
+	height:100%;
+	width:100%;
+	background-color:#DDDDDD;
+}
+
+.container{
+	height:100%;
+	width:100%;
+}
+table{
+  width:100%;
+  table-layout: fixed;
+  border: 2px solid black; border-collapse: collapse;
+}
+thead{
+  background-color: #000000;
+  border: 2px solid black; border-collapse: collapse;
+}
+tbody{
+  height:300px;
+  overflow-x:auto;
+  margin-top: 0px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border: 2px solid black; border-collapse: collapse;
+}
+th{
+  padding: 20px 15px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 20px;
+  color:white;
+  text-transform: uppercase;
+  border: 2px solid black; border-collapse: collapse;
+}
+td{
+  padding: 15px;
+  text-align: center;
+  vertical-align:middle;
+  font-weight: 300;
+  font-size: 15px;
+  color:black;
+  border-bottom: solid 1px rgba(255,255,255,0.1);
+  border: 2px solid black; border-collapse: collapse;
+}

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>smartLock</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+    body {
+        padding-top: 70px;
+        /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+    }
+    </style>
+	
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link  href="https://fonts.googleapis.com/css?family=Allan:bold" rel="stylesheet" type="text/css" >
+	<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+	<script type="text/javascript" src="http://d3js.org/topojson.v1.min.js"></script>
+	<script src="https://webduino.io/components/webduino-js/dist/webduino-all.min.js"></script>
+	<script src="https://blockly.webduino.io/webduino-blockly.js"></script>
+	<script src="https://blockly.webduino.io/lib/runtime.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script>
+	var lastestStatus;
+	var lockName = "\lock1";
+	var flag;
+	var userAccount;
+	$(document).ready( function () {
+		var config = {
+		apiKey: "AIzaSyCyAM9AtsheRumbUzYQDpPhGUbRrhBywQk",
+		authDomain: "smartlock-9c4c4.firebaseapp.com",
+		databaseURL: "https://smartlock-9c4c4.firebaseio.com",
+		projectId: "smartlock-9c4c4",
+		storageBucket: "smartlock-9c4c4.appspot.com",
+		messagingSenderId: "388128189298"
+		};
+		firebase.initializeApp(config);
+		
+
+		firebase.auth().onAuthStateChanged(function(user) {
+		if (user) {
+			// User is signed in.
+			userAccount = user.email;
+			
+			// ...
+			//console.log(user);
+			//alert(uid);
+			//alert("alredy login");
+			$("#user").html("Logout");
+			$("#user").attr("href","");
+			$("#user").click(function(e) {
+				firebase.auth().signOut().then(function() {
+					// Sign-out successful.
+					//console.log("sign out success");
+					
+				}, function(error) {
+					// An error happened.
+				});
+				/*your_code_here;*/
+				window.location = "";
+				return false;
+			});
+		} else {
+            userAccount = "Not logged in";
+			$("#user").html("Login");
+			$("#user").attr("href","login.html");
+			
+			//console.log("Sign Out");
+		}
+		$("#mail").html(userAccount);
+    });
+
+		var database = firebase.database();
+		var lockRef = database.ref(lockName);
+
+
+        lockRef.limitToLast(1).once('value', function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                var lastestStatus = childSnapshot.val().Status;
+                var lastestTime = childSnapshot.val().Time;
+                d3.select("svg").selectAll("text").text(lastestStatus);
+                if(lastestStatus == "lock"){
+                    flag = true;
+                }else{
+                    flag = false;
+                }
+                console.log("latestStatus : " +  lastestStatus);
+                temp();
+            });
+        },function(error) {
+                console.error(error);
+                console.log("error");
+        });
+
+        //console.log(lockRef);
+        lockRef.limitToLast(1).on('value', function(snapshot) {
+            console.log(snapshot.val());
+            snapshot.forEach(function(childSnapshot) {
+                var lastestStatus = childSnapshot.val().Status;
+                var lastestTime = childSnapshot.val().Time;
+                console.log(childSnapshot.val().Status);
+                d3.select("svg").selectAll("text").text(lastestStatus);
+                if(lastestStatus == "lock"){
+                    flag = true;
+                }else{
+                    flag = false;
+                }
+                temp();
+            });
+            
+        },function(error) {
+                console.error(error);
+                console.log("error");
+        });
+        
+        $("#lockSwitch").bind('change',function(e) {
+            var database = firebase.database();
+            var lockRef = database.ref(lockName);
+            if($("#myonoffswitch").is(':checked')) {
+                led.off();
+                var d = new Date();
+                var date = d.toLocaleDateString();
+                var time = d.toLocaleTimeString();
+                var newData = {
+                    Status:"unlock",
+                    User: userAccount,
+                    Time: date + "," + time
+                };
+                lockRef.push(newData,function(error) {
+                    if(error){ 
+                        setTimeout(function(){
+                            alert("請登入");
+                        },300);
+                        temp();
+                    }
+                });
+            } else {
+                var d = new Date();
+                var date = d.toLocaleDateString();
+                var time = d.toLocaleTimeString();
+                var newData = {
+                    Status:"lock",
+                    User: userAccount,
+                    Time: date + "," + time
+                };
+                lockRef.push(newData,function(error) {
+                    if(error){
+                        setTimeout(function(){
+                            alert("請登入");
+                        },300);
+                        temp();
+                    }
+                });
+            
+            }
+        
+        });
+	});
+
+	function temp(){
+		
+		if(flag){
+			document.getElementById("lockSwitch").innerHTML = 
+				'<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">' + 
+					'<label class="onoffswitch-label" for="myonoffswitch">'+
+					'<span class="onoffswitch-inner"></span>'+
+					'<span class="onoffswitch-switch"></span>'+
+				'</label>';
+		}
+		else{
+			document.getElementById("lockSwitch").innerHTML = 
+				'<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>' + 
+					'<label class="onoffswitch-label" for="myonoffswitch">'+
+					'<span class="onoffswitch-inner"></span>'+
+					'<span class="onoffswitch-switch"></span>'+
+				'</label>';
+		}
+	}
+
+
+
+		
+	
+		
+
+	
+
+
+  </script>
+	
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">smartLock</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a id = "user" href="login.html">Login</a>
+                    </li>
+                    <li>
+                        <a href="history.html">History</a>
+                    </li>
+					<li>
+                        <a style = "color:white">Account: <span id = "mail"></span></a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+		<p style='font-size:40px;text-align:center;text-family:"Allan"'>Recent Status</p>
+	
+		<svg height="70%" width="100%">
+			<circle cx="50%" cy="50%" r="150" stroke="black" stroke-width="3" fill="black" />
+			<text x=20% y=55% class="nowStatus"></text>
+		</svg>
+
+		
+		<div id = "lockSwitch" class="onoffswitch"></div>
+	
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery Version 1.11.1 -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
